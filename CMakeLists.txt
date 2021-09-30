@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.12.4)
 project(resource-injector
         VERSION 1.0.0
         DESCRIPTION "A header only c++ library for resource injection"
-        HOMEPAGE_URL "https://github.com/???")
+        HOMEPAGE_URL "https://github.com/ZhekehZ/Resource-Injector")
 
 include(GNUInstallDirs)
 
