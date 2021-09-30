@@ -1,0 +1,8 @@
+    .global @RES_NAME@_data
+    .global @RES_NAME@_size
+    .section .rodata
+@RES_NAME@_data:
+    .incbin "@RES_PATH@"
+1:
+@RES_NAME@_size:
+    .int 1b - @RES_NAME@_data
