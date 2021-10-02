@@ -4,15 +4,15 @@
 CmakeLists.txt:
 
 ```cmake
-SET(RES <resources dir>)
 INJECT_RESOURCES(
-    TARGET          q
-    GENERATE_DIR    gen
+    TARGET          target_name
+    GENERATED_DIR   <some pah>
+    RESOURCES_DIR   <resources dir>
     RESOURCES
-        ${RES}/res.txt          AS NAME1
-        ${RES}/res2.txt         AS NAME2
+        res.txt AS NAME1
+        res2.txt AS NAME2
     COMPILE_TIME_RESOURCES
-        ${RES}/compile_time.txt AS NAME3
+        compile_time.txt AS NAME3
 )
 ```
 
@@ -34,9 +34,9 @@ constinit auto stream2 =
 
 ### Limitations:
 - COMPILE_TIME_RESOURCES support text files only
-- only gcc compiler is supported
+- only gcc and clang compilers are supported
 
 ### TODO:
 - [ ] implement `operator>>(double&)` for compile time resource stream 
 - [ ] ??? support binary files for COMPILE_TIME_RESOURCES 
-- [ ] support clang and msvc compilers
+- [ ] support msvc compiler

@@ -12,7 +12,7 @@ include(CTest)
 conan_cmake_run(REQUIRES catch2/2.13.7
         BASIC_SETUP NO_OUTPUT_DIRS CMAKE_TARGETS)
 
-include(../cmake/injector/Injector.cmake) ## TODO: rework
+include(${PROJECT_SOURCE_DIR}/cmake/injector/Injector.cmake)
 
 add_executable(injector_all_tests)
 
@@ -39,16 +39,17 @@ else ()
     target_compile_options(injector_all_tests PRIVATE -Wpedantic)
 endif ()
 
-SET(RES "${CMAKE_CURRENT_LIST_DIR}/resources")
-INJECT_RESOURCES(
+inject_resources(
         TARGET injector_all_tests
-        GENERATE_DIR ${CMAKE_BINARY_DIR}/generated
+        GENERATED_DIR ${CMAKE_BINARY_DIR}/generated
+        RESOURCES_DIR ${CMAKE_CURRENT_LIST_DIR}/resources
         RESOURCES
-            ${RES}/test_resource1.txt             AS KEK1
-            ${RES}/test_resource2.txt             AS KEK2
-            ${RES}/test_resource_fibonacci.binary AS FIBONACCI
+            test_resource1.txt             AS KEK1
+            test_resource2.txt             AS KEK2
+            test_resource_fibonacci.binary AS FIBONACCI
         COMPILE_TIME_RESOURCES
-            ${RES}/test_resource_fibonacci.txt    AS FIBONACCI_CT
+            test_resource_fibonacci.txt    AS FIBONACCI_CT
+            test_resource2.txt             AS KEK2_CT
 )
 
 add_test(NAME injector_all_tests COMMAND injector_all_tests)
