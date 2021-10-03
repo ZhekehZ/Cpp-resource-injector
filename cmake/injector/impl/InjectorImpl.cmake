@@ -5,7 +5,7 @@ INCLUDE(${CMAKE_CURRENT_LIST_DIR}/CodeGenerator.cmake)
 INCLUDE(${CMAKE_CURRENT_LIST_DIR}/FileUtils.cmake)
 
 ENABLE_LANGUAGE(ASM)
-GET_ASM(GENERIC_ASM_FILE)
+__RES_INJ_GET_ASM(GENERIC_ASM_FILE)
 
 FUNCTION(__RES_INJ_TARGET_INJECT_CONSTEXPR_RESOURCE TARGET RES_NAME PATH)
     __RES_INJ_ASSERT_PATH(PATH)
@@ -52,15 +52,17 @@ FUNCTION(__RES_INJ_TARGET_INJECT_RESOURCE TARGET RES_NAME RES_PATH GENERATED_DIR
     GET_PROPERTY(CURRENT_CODE_USAGE GLOBAL PROPERTY ${PREFIX}_ENUM_USAGE)
 
     SET(NEW_ENUM "${RES_NAME}")
+    SET(RES_NAME ${SOURCE_PREFIX}_${RES_NAME})
+
     __RES_INJ_NEW_CODE(ENUM_USAGE "\
         template <>                                                                      \n\
-        int ___compile_time_data_size<injector::injected_resources::${RES_NAME}>() {     \n\
+        int ___compile_time_data_size<injector::injected_resources::${NEW_ENUM}>() {     \n\
             extern const int ${RES_NAME}_size;                                           \n\
             return ${RES_NAME}_size;                                                     \n\
         }                                                                                \n\
                                                                                          \n\
         template <>                                                                      \n\
-        char const * ___compile_time_data<injector::injected_resources::${RES_NAME}>() { \n\
+        char const * ___compile_time_data<injector::injected_resources::${NEW_ENUM}>() { \n\
             extern const char ${RES_NAME}_data[];                                        \n\
             return ${RES_NAME}_data;                                                     \n\
         }")

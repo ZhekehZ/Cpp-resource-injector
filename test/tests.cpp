@@ -1,6 +1,7 @@
 #include "../include/injector/injector.hpp"
 
 #include <catch.hpp>
+#include <array>
 
 TEST_CASE("Basic-1", "[Text][Run time]") {
     using namespace injector;
@@ -67,4 +68,38 @@ TEST_CASE("Basic-3", "[Text][Compile time][Run time]") {
 
     STATIC_REQUIRE(lambda());
     REQUIRE(lambda());
+}
+
+TEST_CASE("Basic-4", "[Compile time]") {
+    using namespace injector;
+
+    auto check = [] (auto & array) {
+        char expected[] = "test_";
+
+        for (int i = 0; i < 5; ++i) {
+            if (array[i] != expected[i]) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    auto lambda = [=] {
+        auto istream = get_resource_stream<constinit_injected_resources::KEK2_CT>();
+        std::array<char, 5> s = {'a', 'b', 'c', 'd', 'e'};
+        istream >> s;
+        return check(s);
+    };
+
+    auto lambda2 = [=] {
+      auto istream = get_resource_stream<constinit_injected_resources::KEK2_CT>();
+      char s[5] = {'a', 'b', 'c', 'd', 'e'};
+      istream >> s;
+      return check(s);
+    };
+
+    STATIC_REQUIRE(lambda());
+    REQUIRE(lambda());
+    STATIC_REQUIRE(lambda2());
+    REQUIRE(lambda2());
 }

@@ -40,14 +40,14 @@ else ()
 endif ()
 
 inject_resources(
-        TARGET injector_all_tests
-        GENERATED_DIR ${CMAKE_BINARY_DIR}/generated
-        RESOURCES_DIR ${CMAKE_CURRENT_LIST_DIR}/resources
-        RESOURCES
+        target injector_all_tests
+        generated_dir ${CMAKE_BINARY_DIR}/generated
+        resources_dir ${CMAKE_CURRENT_LIST_DIR}/resources
+        resources
             test_resource1.txt             AS KEK1
             test_resource2.txt             AS KEK2
             test_resource_fibonacci.binary AS FIBONACCI
-        COMPILE_TIME_RESOURCES
+        compile_time_resources
             test_resource_fibonacci.txt    AS FIBONACCI_CT
             test_resource2.txt             AS KEK2_CT
 )

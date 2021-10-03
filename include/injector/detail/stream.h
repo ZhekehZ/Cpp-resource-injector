@@ -4,6 +4,7 @@
 #include <istream>
 #include <sstream>
 #include <tuple>
+#include <array>
 
 namespace injector::detail {
 
@@ -58,8 +59,20 @@ class compile_time_stream {
         return *this;
     }
 
+    template <size_t N>
+    constexpr compile_time_stream &operator>>(char (&array)[N]) {
+        read_array<N>(array);
+        return *this;
+    }
+
+    template <size_t N>
+    constexpr compile_time_stream &operator>>(std::array<char, N> &array) {
+        read_array<N>(array.data());
+        return *this;
+    }
+
     [[nodiscard]] constexpr std::size_t rest_size() const {
-        return curr_ - begin_;
+        return end_ - curr_;
     }
 
     [[nodiscard]] constexpr std::size_t size() const {
@@ -83,6 +96,18 @@ class compile_time_stream {
     }
 
  private:
+    template <size_t N>
+    constexpr void read_array(char * array) {
+        if (rest_size() < N) {
+            last_error_ = parse_error_code::NO_CHARS;
+            return;
+        }
+        for (size_t i = 0; i < N; ++i) {
+            array[i] = curr_[i];
+        }
+        curr_ += N;
+    }
+
     constexpr bool prepare() {
         if (last_error_ != parse_error_code::NO_ERROR) {
             return false;
