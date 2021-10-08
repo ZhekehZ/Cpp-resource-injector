@@ -19,12 +19,12 @@ FUNCTION(__RES_INJ_TARGET_INJECT_CONSTEXPR_RESOURCE TARGET RES_NAME PATH)
     __RES_INJ_READ_FILE(PATH TEXT)
     SET(NEW_ENUM "${RES_NAME}")
     __RES_INJ_NEW_CODE(ENUM_USAGE "\
-        template <>                                                                                \n\
+        template <> inline                                                                         \n\
         consteval int ___compile_time_data_size<constinit_injected_resources::${RES_NAME}>() {     \n\
             return sizeof( \"${TEXT}\" );                                                          \n\
         }                                                                                          \n\
                                                                                                    \n\
-        template <>                                                                                \n\
+        template <> inline                                                                         \n\
         consteval char const * ___compile_time_data<constinit_injected_resources::${RES_NAME}>() { \n\
             return \"${TEXT}\";                                                                    \n\
         }")
@@ -55,13 +55,13 @@ FUNCTION(__RES_INJ_TARGET_INJECT_RESOURCE TARGET RES_NAME RES_PATH GENERATED_DIR
     SET(RES_NAME ${SOURCE_PREFIX}_${RES_NAME})
 
     __RES_INJ_NEW_CODE(ENUM_USAGE "\
-        template <>                                                                      \n\
+        template <> inline                                                               \n\
         int ___compile_time_data_size<injector::injected_resources::${NEW_ENUM}>() {     \n\
             extern const int ${RES_NAME}_size;                                           \n\
             return ${RES_NAME}_size;                                                     \n\
         }                                                                                \n\
                                                                                          \n\
-        template <>                                                                      \n\
+        template <> inline                                                               \n\
         char const * ___compile_time_data<injector::injected_resources::${NEW_ENUM}>() { \n\
             extern const char ${RES_NAME}_data[];                                        \n\
             return ${RES_NAME}_data;                                                     \n\

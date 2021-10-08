@@ -50,6 +50,7 @@ inject_resources(
         compile_time_resources
             test_resource_fibonacci.txt    AS FIBONACCI_CT
             test_resource2.txt             AS KEK2_CT
+            test_resource3.txt             AS KEK3
 )
 
 add_test(NAME injector_all_tests COMMAND injector_all_tests)

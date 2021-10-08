@@ -20,6 +20,14 @@ struct resource_stream : virtual const_membuf, virtual std::istream {
     resource_stream(char const *base, size_t size)
         : const_membuf(base, size), std::istream(static_cast<std::streambuf *>(this)) {
     }
+
+    void const * data() const {
+        return this->eback();
+    }
+
+    int size() const {
+        return static_cast<int>(this->egptr() - this->eback());
+    }
 };
 
 class compile_time_stream {
@@ -71,6 +79,23 @@ class compile_time_stream {
         return *this;
     }
 
+    constexpr void skip(size_t n) {
+        curr_ = std::min(curr_ + n, end_);
+    }
+
+    constexpr void set_pos(size_t pos) {
+        curr_ = begin_;
+        skip(pos);
+    }
+
+    constexpr size_t current_pos() {
+        return static_cast<size_t>(curr_ - begin_);
+    }
+
+    constexpr void set_error(parse_error_code error) {
+        last_error_ = error;
+    }
+
     [[nodiscard]] constexpr std::size_t rest_size() const {
         return end_ - curr_;
     }
@@ -93,6 +118,13 @@ class compile_time_stream {
 
     [[nodiscard]] constexpr parse_error_code last_error() const {
         return last_error_;
+    }
+
+    constexpr bool eof() {
+        if (!prepare()) {
+            return false;
+        }
+        return curr_ == end_;
     }
 
  private:

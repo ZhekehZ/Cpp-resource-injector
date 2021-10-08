@@ -70,7 +70,7 @@ TEST_CASE("Basic-3", "[Text][Compile time][Run time]") {
     REQUIRE(lambda());
 }
 
-TEST_CASE("Basic-4", "[Compile time]") {
+TEST_CASE("Basic-4", "[Compile time][Run time]") {
     using namespace injector;
 
     auto check = [] (auto & array) {
@@ -102,4 +102,76 @@ TEST_CASE("Basic-4", "[Compile time]") {
     REQUIRE(lambda());
     STATIC_REQUIRE(lambda2());
     REQUIRE(lambda2());
+}
+
+TEST_CASE("From chars integral", "[from_chars]") {
+    using T = std::tuple<std::string_view, int, bool>;
+    for (T test_case: {
+            T("+123", 123, false),
+            T("-123", -123, false),
+            T("123", 123, false),
+            T("0000123", 123, false),
+            T("0000123   ", 123, true),
+            T("0000123,", 123, true),
+         })
+    {
+        std::string_view str = get<0>(test_case);
+        int res;
+        auto [pos, code] = injector::detail::from_chars(str.begin(), str.end(), res);
+        REQUIRE(code == injector::detail::parse_error_code::NO_ERROR);
+        if (!get<2>(test_case)) {
+            REQUIRE(pos == str.end());
+        }
+        REQUIRE(res == get<1>(test_case));
+    }
+
+
+    for (auto test_case: {
+             "aaa",
+             "111111111111111111111111111111" // overflow
+        })
+    {
+        std::string_view str = test_case;
+        int res;
+        auto [pos, code] = injector::detail::from_chars(str.begin(), str.end(), res);
+        REQUIRE(code != injector::detail::parse_error_code::NO_ERROR);
+        REQUIRE(pos == str.begin());
+    }
+}
+
+TEST_CASE("Parse injected enum", "[parse_enum]") {
+    auto s = injector::get_resource_stream<injector::constinit_injected_resources::KEK3>();
+
+    {
+        injector::injected_resources res;
+        s >> res;
+        REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
+        REQUIRE(res == injector::injected_resources::KEK1);
+    }
+
+    {
+        injector::injected_resources res;
+        s >> res;
+        REQUIRE(s.last_error() == injector::detail::parse_error_code::INVALID_ENUM_NAME);
+
+        s.set_error(injector::detail::parse_error_code::NO_ERROR);
+        std::string_view sv;
+        s >> sv; // SKIP THIS CASE
+    }
+
+    {
+        injector::injected_resources res;
+        s >> res;
+        REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
+        REQUIRE(res == injector::injected_resources::FIBONACCI);
+    }
+
+    {
+        injector::constinit_injected_resources res;
+        s >> res;
+        REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
+        REQUIRE(res == injector::constinit_injected_resources::FIBONACCI_CT);
+    }
+
+    REQUIRE(s.eof());
 }
