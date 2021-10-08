@@ -7,13 +7,15 @@
 namespace injector {
 
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM
-enum class injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM, __ENUM_SIZE };
+enum class injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM,
+                                __ENUM_SIZE }; // NOLINT(bugprone-reserved-identifier)
 #else
 enum class injected_resources {};
 #endif
 
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM
-enum class constinit_injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM, __ENUM_SIZE };
+enum class constinit_injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM,
+                                          __ENUM_SIZE }; // NOLINT(bugprone-reserved-identifier)
 #else
 enum class constinit_injected_resources {};
 #endif
@@ -22,9 +24,13 @@ template<injector::constinit_injected_resources>
 inline consteval int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
 template<injector::constinit_injected_resources>
 inline consteval char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier)
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM_IMPLEMENTATION
 CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM_IMPLEMENTATION
 #endif
+#pragma GCC diagnostic pop
 
 }// namespace injector
 
@@ -33,9 +39,12 @@ inline char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier
 template<injector::injected_resources>
 inline int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM_IMPLEMENTATION
 CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM_IMPLEMENTATION
 #endif
+#pragma GCC diagnostic pop
 
 namespace injector {
 

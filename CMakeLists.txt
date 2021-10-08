@@ -5,6 +5,8 @@ project(resource-injector
         DESCRIPTION "A header only c++ library for resource injection"
         HOMEPAGE_URL "https://github.com/ZhekehZ/Resource-Injector")
 
+OPTION(DO_NOT_TEST "Do not run unit test after build" OFF)
+
 include(GNUInstallDirs)
 
 add_library(${PROJECT_NAME} INTERFACE)
@@ -16,8 +18,10 @@ target_include_directories(
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 
-enable_testing()
-add_subdirectory(test)
+IF (NOT DO_NOT_TEST)
+    enable_testing()
+    add_subdirectory(test)
+ENDIF()
 
 install(TARGETS ${PROJECT_NAME}
         EXPORT ${PROJECT_NAME}_Targets
