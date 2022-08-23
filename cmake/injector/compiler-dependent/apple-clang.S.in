@@ -1,13 +1,16 @@
-    .section .const_data
+    .const_data
 
     .globl @RES_NAME@_data
     .globl @RES_NAME@_size
 
-@RES_NAME@_data:
-    .incbin "@RES_PATH@"
+    .align 4
+_@RES_NAME@_data:
+    .incbin
 1:
 
-@RES_NAME@_size:
-    .long 1b - @RES_NAME@_data
+    .align 4
+_@RES_NAME@_size:
+    .long 1b - _@RES_NAME@_data
 
+    .align 4
     .text

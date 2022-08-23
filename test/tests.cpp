@@ -73,7 +73,7 @@ TEST_CASE("Basic-3", "[Text][Compile time][Run time]") {
 TEST_CASE("Basic-4", "[Compile time][Run time]") {
     using namespace injector;
 
-    auto check = [] (auto & array) {
+    constexpr auto check = [] (auto & array) {
         char expected[] = "test_";
 
         for (int i = 0; i < 5; ++i) {
@@ -84,14 +84,14 @@ TEST_CASE("Basic-4", "[Compile time][Run time]") {
         return true;
     };
 
-    auto lambda = [=] {
+    constexpr auto lambda = [=] {
         auto istream = get_resource_stream<constinit_injected_resources::KEK2_CT>();
         std::array<char, 5> s = {'a', 'b', 'c', 'd', 'e'};
         istream >> s;
         return check(s);
     };
 
-    auto lambda2 = [=] {
+    constexpr auto lambda2 = [=] {
       auto istream = get_resource_stream<constinit_injected_resources::KEK2_CT>();
       char s[5] = {'a', 'b', 'c', 'd', 'e'};
       istream >> s;
@@ -106,25 +106,27 @@ TEST_CASE("Basic-4", "[Compile time][Run time]") {
 
 TEST_CASE("From chars integral", "[from_chars]") {
     using T = std::tuple<std::string_view, int, bool>;
-    for (T test_case: {
-            T("+123", 123, false),
-            T("-123", -123, false),
-            T("123", 123, false),
-            T("0000123", 123, false),
-            T("0000123   ", 123, true),
-            T("0000123,", 123, true),
+    for (auto [str, expected, full_str] : {
+            T("+123", 123, true),
+            T("-123", -123, true),
+            T("123", 123, true),
+            T("0000123", 123, true),
+            T("0000123   ", 123, false),
+            T("0000123,", 123, false),
          })
     {
-        std::string_view str = get<0>(test_case);
-        int res;
-        auto [pos, code] = injector::detail::from_chars(str.begin(), str.end(), res);
-        REQUIRE(code == injector::detail::parse_error_code::NO_ERROR);
-        if (!get<2>(test_case)) {
-            REQUIRE(pos == str.end());
-        }
-        REQUIRE(res == get<1>(test_case));
-    }
+        std::string_view str_sv(str);
 
+        int res;
+        auto [pos, code] = injector::detail::from_chars(
+            str_sv.data(), str_sv.data() + str_sv.size(), res);
+
+        REQUIRE(code == injector::detail::parse_error_code::NO_ERROR);
+        if (full_str) {
+            REQUIRE(pos == str_sv.data() + str_sv.size());
+        }
+        REQUIRE(res == expected);
+    }
 
     for (auto test_case: {
              "aaa",
@@ -133,45 +135,44 @@ TEST_CASE("From chars integral", "[from_chars]") {
     {
         std::string_view str = test_case;
         int res;
-        auto [pos, code] = injector::detail::from_chars(str.begin(), str.end(), res);
+        auto [pos, code] = injector::detail::from_chars(
+            str.data(), str.data() + str.size(), res);
         REQUIRE(code != injector::detail::parse_error_code::NO_ERROR);
-        REQUIRE(pos == str.begin());
+        REQUIRE(pos == str.data());
     }
 }
 
 TEST_CASE("Parse injected enum", "[parse_enum]") {
     auto s = injector::get_resource_stream<injector::constinit_injected_resources::KEK3>();
+    injector::injected_resources kek1;
+    injector::injected_resources fail;
+    std::string_view fail_skip;
+    injector::injected_resources fibonacci;
+    injector::constinit_injected_resources fibonacci_ct;
 
-    {
-        injector::injected_resources res;
-        s >> res;
+    SECTION("OK [KEK1]") {
+        s >> kek1;
         REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
-        REQUIRE(res == injector::injected_resources::KEK1);
+        REQUIRE(s.current_pos() == 4);
+        REQUIRE(kek1 == injector::injected_resources::KEK1);
     }
 
-    {
-        injector::injected_resources res;
-        s >> res;
+    SECTION("INVALID_ENUM_NAME") {
+        s >> kek1 >> fail;
+        REQUIRE(s.current_pos() == 4);
         REQUIRE(s.last_error() == injector::detail::parse_error_code::INVALID_ENUM_NAME);
-
-        s.set_error(injector::detail::parse_error_code::NO_ERROR);
-        std::string_view sv;
-        s >> sv; // SKIP THIS CASE
     }
 
-    {
-        injector::injected_resources res;
-        s >> res;
+    SECTION("OK [FIBONACCI]") {
+        s >> kek1 >> fail_skip >> fibonacci;
         REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
-        REQUIRE(res == injector::injected_resources::FIBONACCI);
+        REQUIRE(fibonacci == injector::injected_resources::FIBONACCI);
     }
 
-    {
-        injector::constinit_injected_resources res;
-        s >> res;
+    SECTION("OK [FIBONACCI_CT]") {
+        s >> kek1 >> fail_skip >> fibonacci >> fibonacci_ct;
         REQUIRE(s.last_error() == injector::detail::parse_error_code::NO_ERROR);
-        REQUIRE(res == injector::constinit_injected_resources::FIBONACCI_CT);
+        REQUIRE(fibonacci_ct == injector::constinit_injected_resources::FIBONACCI_CT);
+        REQUIRE(s.eof());
     }
-
-    REQUIRE(s.eof());
 }

@@ -4,14 +4,14 @@
     .global @RES_NAME@_data
     .global @RES_NAME@_size
 
-    .balign 4
+    .align 4
 @RES_NAME@_data:
-    .incbin "@RES_PATH@"
+    .incbin ""
 1:
 
-    .balign 4
+    .align 4
 @RES_NAME@_size:
     .long 1b - @RES_NAME@_data
 
-    .balign 4
+    .align 4
     .text
