@@ -10,7 +10,7 @@ namespace injector {
 enum class injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM,
                                 __ENUM_SIZE }; // NOLINT(bugprone-reserved-identifier)
 #else
-enum class injected_resources {};
+enum class injected_resources { __ENUM_SIZE };
 #endif
 
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM

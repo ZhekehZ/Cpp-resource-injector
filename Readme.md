@@ -1,8 +1,14 @@
-## Resource injector
+## Resource injector [c++20]
+
+A header only c++ library for resource injection
+
+[![Conan version - resource-injector/0.1@zhekehz/stable](https://img.shields.io/badge/Conan_version-resource--injector%2F0.1%40zhekehz%2Fstable-6699cb?logo=conan&logoColor=6699cb)](https://https://zhekehz.jfrog.io/artifactory/api/conan/zhekehz-conan)
+[![20](https://img.shields.io/badge/20-red?logo=c%2B%2B)](https://)
+---
+
 ### Usage
 
 CmakeLists.txt:
-
 ```cmake
 INJECT_RESOURCES(
     TARGET          target_name
@@ -32,11 +38,28 @@ constinit auto stream2 =
 // (*) If compilation flags "-fdata-sections -ffunction-sections -Wl,--gc-sections" are used
 ```
 
-### Limitations:
-- COMPILE_TIME_RESOURCES support text files only
-- only gcc and clang compilers are supported
+### Installation:
+- via Cmake
+    ```bash
+    mkdir -p build && \
+    cmake -B build && \
+    cmake --build build --target test && \
+    sudo cmake --build build --target install
+    ```
+- via Conan:
+    1. add remote repo:
+        ```bash
+        conan remote add zhekehz-conan https://zhekehz.jfrog.io/artifactory/api/conan/zhekehz-conan
+        ```
+    2. Configure CMake project:
+        ```cmake
+        conan_cmake_run(REQUIRES resource-injector/0.1@zhekehz/stable)
+        conan_basic_setup()
+        find_package(resource-injector)
+        ```
+       see the [exmaple subproject](example) for more details
+
 
 ### TODO:
-- [ ] implement `operator>>(double&)` for compile time resource stream 
+- [ ] refactor compile-time parsers 
 - [ ] ??? support binary files for COMPILE_TIME_RESOURCES 
-- [ ] support msvc compiler
