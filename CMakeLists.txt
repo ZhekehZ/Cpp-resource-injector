@@ -51,4 +51,5 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/injector DESTINATION include)
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake/injector DESTINATION /usr/lib/injector/cmake)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake/injector DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/injector/cmake)
