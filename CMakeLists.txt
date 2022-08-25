@@ -5,7 +5,7 @@ project(resource-injector
         DESCRIPTION "A header only c++ library for resource injection"
         HOMEPAGE_URL "https://github.com/ZhekehZ/Resource-Injector")
 
-OPTION(DO_NOT_TEST "Do not run unit test after build" OFF)
+option(DO_NOT_TEST "Do not run unit test after build" OFF)
 
 include(GNUInstallDirs)
 
