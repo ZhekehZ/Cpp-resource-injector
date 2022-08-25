@@ -31,6 +31,5 @@ class ResourceInjectorConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        cmake_scripts = join(self.package_folder, "lib", "injector", "cmake", "injector")
-        if exists(cmake_scripts):
-            self.cpp_info.build_modules = [ join(cmake_scripts, "Injector.cmake") ]
+        cmake_impl = join(self.package_folder, "share", "resource-injector", "cmake")
+        self.cpp_info.build_modules["cmake_find_package"].append(cmake_impl)

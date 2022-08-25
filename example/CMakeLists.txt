@@ -13,7 +13,8 @@ include(${CMAKE_BINARY_DIR}/conan.cmake)
 
 ## 2. ADD CONAN DEPENDENCIES
 conan_cmake_run(REQUIRES resource-injector/0.1@zhekehz/stable)  ## finds c++ headers
-conan_include_build_modules()  ## defines cmake functions
+conan_basic_setup()
+find_package(resource-injector)  ## imports cmake functions
 
 ## 3. CREATE EXECUTABLE
 add_executable(${PROJECT_NAME} main.cpp)
