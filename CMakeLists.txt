@@ -5,7 +5,7 @@ project(resource-injector
         DESCRIPTION "A header only c++ library for resource injection"
         HOMEPAGE_URL "https://github.com/ZhekehZ/Resource-Injector")
 
-OPTION(DO_NOT_TEST "Do not run unit test after build" OFF)
+option(DO_NOT_TEST "Do not run unit test after build" OFF)
 
 include(GNUInstallDirs)
 
@@ -51,4 +51,5 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}/cmake)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/injector DESTINATION include)
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake/injector DESTINATION /usr/lib/injector/cmake)
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/cmake/injector DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/injector/cmake)

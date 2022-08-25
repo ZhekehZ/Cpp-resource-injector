@@ -21,10 +21,12 @@ struct resource_stream : virtual const_membuf, virtual std::istream {
         : const_membuf(base, size), std::istream(static_cast<std::streambuf *>(this)) {
     }
 
+    [[nodiscard]]
     void const * data() const {
         return this->eback();
     }
 
+    [[nodiscard]]
     int size() const {
         return static_cast<int>(this->egptr() - this->eback());
     }

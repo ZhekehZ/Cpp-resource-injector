@@ -14,48 +14,41 @@ enum class injected_resources {};
 #endif
 
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM
-enum class constinit_injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM,
-                                          __ENUM_SIZE }; // NOLINT(bugprone-reserved-identifier)
+enum class constinit_injected_resources { CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM }; // NOLINT(bugprone-reserved-identifier)
 #else
 enum class constinit_injected_resources {};
 #endif
 
 template<injector::constinit_injected_resources>
-inline consteval int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
+consteval int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
 template<injector::constinit_injected_resources>
-inline consteval char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier)
+consteval char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier)
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM_IMPLEMENTATION
 CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM_IMPLEMENTATION
 #endif
-#pragma GCC diagnostic pop
 
 }// namespace injector
 
 template<injector::injected_resources>
-inline char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier)
+char const *___compile_time_data();// NOLINT(bugprone-reserved-identifier)
 template<injector::injected_resources>
-inline int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
+int ___compile_time_data_size();// NOLINT(bugprone-reserved-identifier)
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
 #ifdef CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM_IMPLEMENTATION
 CMAKE_RESOURCE_INJECTOR_PREFIX_ENUM_IMPLEMENTATION
 #endif
-#pragma GCC diagnostic pop
 
 namespace injector {
 
 template<injected_resources Injection>
-inline auto get_resource_stream() {
+auto get_resource_stream(injected_resources = Injection) {
     return detail::resource_stream(::___compile_time_data<Injection>(),
                                    ::___compile_time_data_size<Injection>());
 }
 
 template<constinit_injected_resources Injection>
-inline constexpr auto get_resource_stream() {
+constexpr auto get_resource_stream(constinit_injected_resources = Injection) {
     return detail::compile_time_stream(___compile_time_data<Injection>(),
                                        ___compile_time_data_size<Injection>());
 }
@@ -83,8 +76,8 @@ inline detail::resource_stream get_resource_stream(injected_resources injection)
 
 namespace detail {
 
-template<typename T, typename SELF>
-inline constexpr compile_time_stream & parse_enum(compile_time_stream & cs, T & val) {
+template<typename T, std::size_t FIRST_IDX, typename SELF>
+constexpr compile_time_stream & parse_enum(compile_time_stream & cs, T & val) {
     char const *it = SELF::TEXT;
     size_t idx = 0;
 
@@ -92,14 +85,25 @@ inline constexpr compile_time_stream & parse_enum(compile_time_stream & cs, T & 
     size_t initial_pos = cs.current_pos();
     cs >> word;
 
+    if (cs.last_error() != parse_error_code::NO_ERROR) {
+        return cs;
+    }
+
+    if (word.empty()) {
+        cs.set_error(parse_error_code::INVALID_ENUM_NAME);
+        return cs;
+    }
+
     while (*it != '\0') {
-        char const *cmp_it = word.begin();
-        while (cmp_it < word.end() && *it != '\0' && *it != ',' && *it == *cmp_it) {
+        char const * start = it;
+        auto cmp_it = word.begin();
+        while (cmp_it != word.end() && *it == *cmp_it && *it != '\0' && *it != ',') {
             ++cmp_it;
             ++it;
         }
-        if (*it == '\0' || *it == ',') {
-            val = static_cast<T>(idx);
+
+        if (it - start == word.size() && *it == '\0' || *it == ',' || *it == ' ') {
+            val = static_cast<T>(FIRST_IDX + idx);
             return cs;
         }
         while (*it != '\0' && *it != ',') {
@@ -129,7 +133,7 @@ struct injected_enum_parser<true> {
 
     constexpr static compile_time_stream & parse_enum(
         compile_time_stream & cs, injected_resources & val) {
-        return ::injector::detail::parse_enum<injected_resources,
+        return ::injector::detail::parse_enum<injected_resources, 0,
                                               injected_enum_parser>(cs, val);
     };
 };
@@ -139,10 +143,12 @@ struct injected_enum_parser<false> {
     static constexpr char const * TEXT =
         __INJ_RES_MACRO_TO_STRING(CMAKE_RESOURCE_INJECTOR_PREFIX_CONSTEXPR_ENUM);
 
-    constexpr static compile_time_stream & parse_enum(
-        compile_time_stream & cs, constinit_injected_resources & val) {
-        return ::injector::detail::parse_enum<constinit_injected_resources,
-                                              injected_enum_parser>(cs, val);
+    constexpr static compile_time_stream &parse_enum(
+        compile_time_stream &cs, constinit_injected_resources &val) {
+        return ::injector::detail::parse_enum<
+            constinit_injected_resources,
+            static_cast<std::size_t>(injected_resources::__ENUM_SIZE),
+            injected_enum_parser>(cs, val);
     };
 };
 

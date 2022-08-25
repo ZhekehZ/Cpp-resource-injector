@@ -12,7 +12,7 @@ enum class parse_error_code : std::size_t {
     INVALID_FORMAT,
     INVALID_SIGNEDNESS,
     INVALID_ENUM_NAME,
-    OVERFLOW
+    OVERFLOWED
 };
 
 namespace detail {
@@ -96,7 +96,7 @@ inline constexpr detail::from_chars_result from_chars(char const *begin, char co
         bool overflow = (sign > 0 && i > max_div_10) ||
                         (sign < 0 && i < min_div_10);
         if (overflow) {
-            return {begin, parse_error_code::OVERFLOW};
+            return {begin, parse_error_code::OVERFLOWED};
         }
         i *= 10;
 
@@ -104,7 +104,7 @@ inline constexpr detail::from_chars_result from_chars(char const *begin, char co
         overflow = (sign > 0 && i > max - digit) ||
                    (sign < 0 && i < min + digit);
         if (overflow) {
-            return {begin, parse_error_code::OVERFLOW};
+            return {begin, parse_error_code::OVERFLOWED};
         }
         i += sign > 0 ? digit : -digit;
         ++pos;
@@ -116,6 +116,8 @@ inline constexpr detail::from_chars_result from_chars(char const *begin, char co
 
     return {pos, parse_error_code::NO_ERROR};
 }
+
+
 
 template<std::floating_point Real>
 inline constexpr detail::from_chars_result from_chars(char const *begin, char const *end, Real &r) {// TODO: Finish
