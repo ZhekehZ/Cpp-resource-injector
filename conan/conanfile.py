@@ -1,5 +1,5 @@
 from conans import ConanFile, CMake
-from os.path import join
+from os.path import join, exists
 from os import environ
 
 
@@ -32,4 +32,5 @@ class ResourceInjectorConan(ConanFile):
 
     def package_info(self):
         cmake_scripts = join(self.package_folder, "lib", "injector", "cmake", "injector")
-        self.cpp_info.build_modules.append(join(cmake_scripts, "Injector.cmake"))
+        if exists(cmake_scripts):
+            self.cpp_info.build_modules = [ join(cmake_scripts, "Injector.cmake") ]
