@@ -1,5 +1,4 @@
-    .section
-    .rodata
+    .section .rodata
 
     .global @RES_NAME@_data
     .global @RES_NAME@_size

@@ -29,7 +29,8 @@ FUNCTION(__RES_INJ_TARGET_INJECT_CONSTEXPR_RESOURCE TARGET RES_NAME PATH)
             return \"${TEXT}\";                                                                    \n\
         }")
 
-    __RES_INJ_APPEND_COMMA_SEP(CURRENT_CODE_ENUM NEW_ENUM " = injected_resources::__ENUM_SIZE")
+    __RES_INJ_APPEND_COMMA_SEP(CURRENT_CODE_ENUM NEW_ENUM
+            " = static_cast<int>(injected_resources::__ENUM_SIZE)")
     __RES_INJ_APPEND_CODE(CURRENT_CODE_USAGE ENUM_USAGE)
 
     SET_PROPERTY(GLOBAL PROPERTY ${PREFIX}_CONSTEXPR_ENUM "${CURRENT_CODE_ENUM}")

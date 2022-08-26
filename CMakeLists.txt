@@ -6,6 +6,7 @@ project(resource-injector
         HOMEPAGE_URL "https://github.com/ZhekehZ/Resource-Injector")
 
 option(DO_NOT_TEST "Do not run unit test after build" OFF)
+option(INSTALL_VIA_CONAN "Write relative conan include paths" OFF)
 
 include(GNUInstallDirs)
 
@@ -34,6 +35,14 @@ include(CMakePackageConfigHelpers)
 write_basic_package_version_file("${PROJECT_NAME}ConfigVersion.cmake"
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion)
+
+if (${INSTALL_VIA_CONAN})
+    set(PATH_TO_INJECTOR_CMAKE
+            "${CONAN_LIB_DIRS_RESOURCE-INJECTOR}/injector/cmake/injector/")
+else()
+    set(PATH_TO_INJECTOR_CMAKE
+            "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/injector/cmake/injector/")
+endif()
 
 configure_package_config_file(
         "${PROJECT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"

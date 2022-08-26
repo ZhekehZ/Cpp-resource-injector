@@ -102,7 +102,10 @@ constexpr compile_time_stream & parse_enum(compile_time_stream & cs, T & val) {
             ++it;
         }
 
-        if (it - start == word.size() && *it == '\0' || *it == ',' || *it == ' ') {
+        if (
+            *it == ',' || *it == ' ' ||
+            (static_cast<unsigned long>(it - start) == word.size() && *it == '\0')
+        ) {
             val = static_cast<T>(FIRST_IDX + idx);
             return cs;
         }

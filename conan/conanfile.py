@@ -23,6 +23,7 @@ class ResourceInjectorConan(ConanFile):
     def _cmake(self):
         cmake = CMake(self)
         cmake.definitions["DO_NOT_TEST"] = "ON"
+        cmake.definitions["INSTALL_VIA_CONAN"] = "ON"
         cmake.configure()
         return cmake
 
