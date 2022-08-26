@@ -61,5 +61,6 @@ constinit auto stream2 =
 
 
 ### TODO:
+- [ ] add alignment
 - [ ] refactor compile-time parsers 
 - [ ] ??? support binary files for COMPILE_TIME_RESOURCES 
