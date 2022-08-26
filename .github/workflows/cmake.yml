@@ -51,6 +51,9 @@ jobs:
       - name: Get Conan
         uses: turtlebrowser/get-conan@v1.1
       
+      - name: Add Conan remote
+        run: conan remote add zhekehz-conan https://zhekehz.jfrog.io/artifactory/api/conan/zhekehz-conan
+      
       - name: Build and run example
         run: |
           cd example
