@@ -38,6 +38,31 @@ constinit auto stream2 =
 // (*) If compilation flags "-fdata-sections -ffunction-sections -Wl,--gc-sections" are used
 ```
 
+### Other features:
+- Compile time stream
+```c++
+    auto ct_lambda = [] {
+        using namespace injector;
+        auto fib_ct = injector::get_resource_stream<constinit_injected_resources::FIBONACCI_CT>();
+
+        int x = fib_value;
+        for (int expected : {0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377}) {
+            fib_ct >> fib_value;
+            if (fib_value != expected) return false;
+        }
+        return true;
+    };
+    
+    static_assert(ct_lambda());
+```
+- Injected enum parsing
+```c++
+    injector::injected_resources resource;
+    auto s = injector::get_resource_stream<...>(); /* file content: "FIBONACCI lorem ipsum" */
+    s >> resource;
+    assert(resource == injector::injected_resources::FIBONACCI);
+```
+
 ### Installation:
 - via Cmake
     ```bash
