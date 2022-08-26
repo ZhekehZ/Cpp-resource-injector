@@ -1,4 +1,4 @@
-## Resource injector [c++20]
+## Cpp-resource-injector [c++20]
 
 A header only c++ library for resource injection
 
